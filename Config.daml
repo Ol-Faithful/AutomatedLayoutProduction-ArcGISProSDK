@@ -1,0 +1,30 @@
+﻿<ArcGIS defaultAssembly="AutomatedLayoutProduction.dll" defaultNamespace="AutomatedLayoutProduction" xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
+  <AddInInfo id="{6e00c37e-e489-4f71-8b37-d71cbc902574}" version="1.0" desktopVersion="3.3.52636" product="ArcGISPro">
+    <Name>AutomatedLayoutProduction</Name>
+    <Description>AutomatedLayoutProduction description</Description>
+    <Image>Images\AddinDesktop32.png</Image>
+    <Author>lucas</Author>
+    <Company>Acme</Company>
+    <Date>7/9/2024 4:32:48 PM</Date>
+    <Subject>Framework</Subject>
+  </AddInInfo>
+  <modules>
+    <insertModule id="AutomatedLayoutProduction_Module" className="Module1" autoLoad="false" caption="Automated Layout Production">
+      <tabs>
+        <tab id="AutomatedLayoutProduction_Tab1" caption="Automated Layout Production">
+          <group refID="AutomatedLayoutProduction_Group1"/>
+        </tab>
+      </tabs>
+      <groups>
+        <group id="AutomatedLayoutProduction_Group1" caption="Layouts" appearsOnAddInTab="true">
+          <tool refID="AutomatedLayoutProduction_LandscapeLayoutWithInset" size="large" />
+        </group>
+      </groups>
+      <controls>
+        <tool id="AutomatedLayoutProduction_LandscapeLayoutWithInset" caption="Landscape Layout With Inset" className="LandscapeLayoutWithInset" loadOnClick="true" smallImage="GenericButtonRed16" largeImage="GenericButtonRed32">
+          <tooltip heading="Tooltip Heading">Tooltip text<disabledText /></tooltip>
+        </tool>
+      </controls>
+    </insertModule>
+  </modules>
+</ArcGIS>
