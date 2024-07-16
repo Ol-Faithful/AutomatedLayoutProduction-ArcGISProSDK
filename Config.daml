@@ -12,16 +12,21 @@
     <insertModule id="AutomatedLayoutProduction_Module" className="Module1" autoLoad="false" caption="Automated Layout Production">
       <tabs>
         <tab id="AutomatedLayoutProduction_Tab1" caption="Automated Layout Production">
-          <group refID="AutomatedLayoutProduction_Group1"/>
+          <group refID="AutomatedLayoutProduction_Group1" />
         </tab>
       </tabs>
       <groups>
         <group id="AutomatedLayoutProduction_Group1" caption="Layouts" appearsOnAddInTab="true">
           <tool refID="AutomatedLayoutProduction_LandscapeLayoutWithInset" size="large" />
+          <tool refID="AutomatedLayoutProduction_PortraitLayoutWithInset" size="large" />
         </group>
       </groups>
       <controls>
         <tool id="AutomatedLayoutProduction_LandscapeLayoutWithInset" caption="Landscape Layout With Inset" className="LandscapeLayoutWithInset" loadOnClick="true" smallImage="GenericButtonRed16" largeImage="GenericButtonRed32">
+          <tooltip heading="Tooltip Heading">Tooltip text<disabledText /></tooltip>
+        </tool>
+        <!--use condition="esri_layouts_layoutPane" to enable only in layout view-->
+        <tool id="AutomatedLayoutProduction_PortraitLayoutWithInset" caption="Portrait Layout With Inset" className="PortraitLayoutWithInset" loadOnClick="true" smallImage="GenericButtonRed16" largeImage="GenericButtonRed32">
           <tooltip heading="Tooltip Heading">Tooltip text<disabledText /></tooltip>
         </tool>
       </controls>
