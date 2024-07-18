@@ -63,7 +63,7 @@ namespace AutomatedLayoutProduction
                     }
                 }
 
-                Coordinate2D smll = new(7.125, 4.125);
+                Coordinate2D smll = new(7, 4.125);
                 Coordinate2D smur = new(10.875, 8.375);
                 ArcGIS.Core.Geometry.Envelope env2 = EnvelopeBuilderEx.CreateEnvelope(smll, smur);
 
@@ -73,7 +73,7 @@ namespace AutomatedLayoutProduction
 
                 SymbolStyleItem point = stylePrjItm.SearchSymbols(StyleItemType.PointSymbol, "Esri Pin 1")[0];
                 CIMPointSymbol pointCIM = point.Symbol as CIMPointSymbol;
-                pointCIM.SetSize(40);
+                pointCIM.SetSize(30);
 
                 CIMSymbolReference pointCIMRef = new()
                 {
@@ -231,7 +231,7 @@ namespace AutomatedLayoutProduction
 
                 var arrowElm = ElementFactory.Instance.CreateMapSurroundElement(
                     newLayout, naPosition.ToMapPoint(), naInfo, "North Arrow") as NorthArrow;
-                arrowElm.SetHeight(1.0);  // Adjust height as needed
+                arrowElm.SetHeight(.8);  // Adjust height as needed
 
                 var northArrowCim = arrowElm.GetDefinition() as CIMMarkerNorthArrow;
                 var naPolyFille = SymbolFactory.Instance.ConstructSolidFill(ColorFactory.Instance.CreateRGBColor(0, 174, 239, 100));
@@ -335,8 +335,8 @@ namespace AutomatedLayoutProduction
                 }
 
                 //Add rectangle around legend
-                Coordinate2D legrec_ll = new(7.125, 1.125);
-                Coordinate2D legrec_ur = new(10.875, 4);
+                Coordinate2D legrec_ll = new(7, 1.125);
+                Coordinate2D legrec_ur = new(10.875, 4.125);
                 ArcGIS.Core.Geometry.Envelope legrecEnv = EnvelopeBuilderEx.CreateEnvelope(legrec_ll, legrec_ur);
 
                 CIMStroke legRecStroke = SymbolFactory.Instance.ConstructStroke(ColorFactory.Instance.BlackRGB);
@@ -354,8 +354,8 @@ namespace AutomatedLayoutProduction
                 //Add Map Frame Description automated text to bottom right of layout
                 string description = $@"<dyn type =""mapFrame"" name =""Core Map Frame"" property =""description"" />";
 
-                Coordinate2D description_ll = new(7.125, 0.125);
-                Coordinate2D description_ur = new(10.875, 1);
+                Coordinate2D description_ll = new(7, 0.125);
+                Coordinate2D description_ur = new(10.875, 1.125);
                 ArcGIS.Core.Geometry.Envelope descEnvPosition = EnvelopeBuilderEx.CreateEnvelope(description_ll, description_ur);
 
                 CIMTextSymbol cimDesc = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 10, "Arial", "Regular");
@@ -378,6 +378,14 @@ namespace AutomatedLayoutProduction
 
                     descText.SetGraphic(cimDescText);
                 }
+
+                //Remove Service Layer
+                string serviceLayer = $@"<dyn type =""layout"" name =""Landscape Layout with Inset"" property = ""serviceLayerCredits""/>";
+                Coordinate2D serviceLayer_ll = new(0, 0);
+
+                CIMTextSymbol cimServiceLayer = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.CreateRGBColor(255, 255, 255, 0), 10);
+                var servText = ElementFactory.Instance.CreateTextGraphicElement(newLayout, TextType.PointText, serviceLayer_ll.ToMapPoint(), cimServiceLayer, serviceLayer, "Invisible Service Layer");
+
 
                 // Return the updated layout
                 return newLayout;

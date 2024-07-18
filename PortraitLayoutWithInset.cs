@@ -1,5 +1,6 @@
 ﻿using ArcGIS.Core.CIM;
 using ArcGIS.Core.Geometry;
+using ArcGIS.Core.Internal.CIM;
 using ArcGIS.Desktop.Core;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace AutomatedLayoutProduction
                 StyleProjectItem stylePrjItm = Project.Current.GetItems<StyleProjectItem>().FirstOrDefault(item => item.Name == "ArcGIS 2D");
                 // Build geometry for the map frame to take up most of the layout
                 Coordinate2D ll = new(0.125, 0.125);
-                Coordinate2D ur = new(8.375, 10.875);
+                Coordinate2D ur = new(8.375, 10.2554);
                 ArcGIS.Core.Geometry.Envelope env = EnvelopeBuilderEx.CreateEnvelope(ll, ur);
 
                 // Reference the active map
@@ -58,12 +59,13 @@ namespace AutomatedLayoutProduction
 
                         // Zoom out 15 percent
                         Camera cam = mfElm.Camera;
-                        cam.Scale *= 1.15;
+                        cam.Scale *= 1.20;
                         mfElm.SetCamera(cam);
                     }
                 }
 
-                Coordinate2D smll = new(7, 9.0515);
+                //Create Inset Mapframe
+                Coordinate2D smll = new(6, 8.375);
                 Coordinate2D smur = new(8.375, 10.875);
                 ArcGIS.Core.Geometry.Envelope env2 = EnvelopeBuilderEx.CreateEnvelope(smll, smur);
 
@@ -137,7 +139,7 @@ namespace AutomatedLayoutProduction
 
                 // Add Title bar graphic element
                 Coordinate2D tBar_ll = new(0.125, 10.25);
-                Coordinate2D tBar_ur = new(7, 10.875);
+                Coordinate2D tBar_ur = new(6, 10.875);
                 ArcGIS.Core.Geometry.Envelope tBarEnv = EnvelopeBuilderEx.CreateEnvelope(tBar_ll, tBar_ur);
 
                 CIMStroke tBarStroke = SymbolFactory.Instance.ConstructStroke(ColorFactory.Instance.BlackRGB);
@@ -152,9 +154,9 @@ namespace AutomatedLayoutProduction
                 var tBar = ElementFactory.Instance.CreateGraphicElement(newLayout, tBarGraphic, "Title Bar", true, tBarElInfo);
 
 
-                // Add the map name as a title in the top left corner of the map Frame
+                // Add the map name as a title in the bottom right corner of the map Frame
                 string title = $@"<dyn type=""mapFrame"" name=""Core Map Frame"" property=""mapName""/>";
-                Coordinate2D titlePosition = new(0.25, 7.2248);
+                Coordinate2D titlePosition = new(5.875, 1.375);
 
                 SymbolStyleItem polyHalo = stylePrjItm.SearchSymbols(StyleItemType.PolygonSymbol, "Glacier")[0];
 
@@ -174,9 +176,9 @@ namespace AutomatedLayoutProduction
 
                 //Add title to second map frame
                 string title2 = $@"<dyn type=""mapFrame""name=""Inset Map Frame"" property=""mapName""/>";
-                Coordinate2D title2Position = new(8.1983, 9.2414);
+                Coordinate2D title2Position = new(8.25, 8.638);
 
-                CIMTextSymbol cimTitle2 = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 8, "Arial", "Bold");
+                CIMTextSymbol cimTitle2 = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 10, "Arial", "Bold");
                 cimTitle2.HaloSize = .5;
                 cimTitle2.HaloSymbol = glacierHalo;
 
@@ -221,7 +223,7 @@ namespace AutomatedLayoutProduction
                 NorthArrowStyleItem naStyleItm = stylePrjItm.SearchNorthArrows("ArcGIS North 10")[0];
 
                 // Position the north arrow in the top right corner of the layout
-                Coordinate2D naPosition = new(6.5829, 7.125);
+                Coordinate2D naPosition = new(0.5421, 9.6308);
 
                 var naInfo = new NorthArrowInfo()
                 {
@@ -231,7 +233,7 @@ namespace AutomatedLayoutProduction
 
                 var arrowElm = ElementFactory.Instance.CreateMapSurroundElement(
                     newLayout, naPosition.ToMapPoint(), naInfo, "North Arrow") as NorthArrow;
-                arrowElm.SetHeight(1.0);  // Adjust height as needed
+                arrowElm.SetHeight(.8);  // Adjust height as needed
 
                 var northArrowCim = arrowElm.GetDefinition() as CIMMarkerNorthArrow;
                 var naPolyFille = SymbolFactory.Instance.ConstructSolidFill(ColorFactory.Instance.CreateRGBColor(0, 174, 239, 100));
@@ -269,6 +271,23 @@ namespace AutomatedLayoutProduction
                     cimScaleBar.FittingStrategy = ScaleBarFittingStrategy.AdjustFrame;
                     sbElm.SetDefinition(cimScaleBar);
                 }
+
+                //Add rectangle around legend
+                Coordinate2D legrec_ll = new(.125, .125);
+                Coordinate2D legrec_ur = new(4, 2);
+                ArcGIS.Core.Geometry.Envelope legrecEnv = EnvelopeBuilderEx.CreateEnvelope(legrec_ll, legrec_ur);
+
+                CIMStroke legRecStroke = SymbolFactory.Instance.ConstructStroke(ColorFactory.Instance.BlackRGB);
+                CIMPolygonSymbol legrecPolySym = SymbolFactory.Instance.ConstructPolygonSymbol(ColorFactory.Instance.CreateRGBColor(255, 255, 255, 50), SimpleFillStyle.Solid, legRecStroke);
+                CIMGraphic rect = GraphicFactory.Instance.CreateSimpleGraphic(legrecEnv, legrecPolySym);
+
+                var legRectInfo = new ElementInfo()
+                {
+                    Anchor = Anchor.BottomLeftCorner,
+                };
+
+                var legendRectangle = ElementFactory.Instance.CreateGraphicElement(newLayout, rect, "Legend Rectangle", true, legRectInfo);
+
 
                 // Add a legend in the bottom left corner of the layout
                 Coordinate2D leg_ul = new(0.25, 1.875);
@@ -334,23 +353,6 @@ namespace AutomatedLayoutProduction
                     legendElm.SetDefinition(cimLegend);
                 }
 
-                //Add rectangle around legend
-                Coordinate2D legrec_ll = new(.125, .125);
-                Coordinate2D legrec_ur = new(4, 2);
-                ArcGIS.Core.Geometry.Envelope legrecEnv = EnvelopeBuilderEx.CreateEnvelope(legrec_ll, legrec_ur);
-
-                CIMStroke legRecStroke = SymbolFactory.Instance.ConstructStroke(ColorFactory.Instance.BlackRGB);
-                CIMPolygonSymbol legrecPolySym = SymbolFactory.Instance.ConstructPolygonSymbol(ColorFactory.Instance.CreateRGBColor(0, 122, 194, 30), SimpleFillStyle.Solid, legRecStroke);
-                CIMGraphic rect = GraphicFactory.Instance.CreateSimpleGraphic(legrecEnv, legrecPolySym);
-
-                var legRectInfo = new ElementInfo()
-                {
-                    Anchor = Anchor.BottomLeftCorner,
-                };
-
-                var legendRectangle = ElementFactory.Instance.CreateGraphicElement(newLayout, rect, "Legend Rectangle", true, legRectInfo);
-
-
                 //Add Map Frame Description automated text to bottom right of layout
                 string description = $@"<dyn type =""mapFrame"" name =""Core Map Frame"" property =""description"" />";
 
@@ -358,8 +360,9 @@ namespace AutomatedLayoutProduction
                 Coordinate2D description_ur = new(8.125, 1.25);
                 ArcGIS.Core.Geometry.Envelope descEnvPosition = EnvelopeBuilderEx.CreateEnvelope(description_ll, description_ur);
 
-                CIMTextSymbol cimDesc = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 10, "Arial", "Regular");
+                CIMTextSymbol cimDesc = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 8, "Arial", "Regular");
                 cimDesc.HorizontalAlignment = HorizontalAlignment.Center;
+                cimDesc.OffsetY = -5;
 
                 var descInfo = new ElementInfo()
                 {
@@ -369,16 +372,24 @@ namespace AutomatedLayoutProduction
 
 
                 var descText = ElementFactory.Instance.CreateTextGraphicElement(newLayout, TextType.RectangleParagraph, descEnvPosition.Extent, cimDesc, description, "Core Frame Description", true, descInfo);
+                
+                var polySymbol = SymbolFactory.Instance.ConstructPolygonSymbol(ColorFactory.Instance.CreateRGBColor(255, 255, 255, 50), SimpleFillStyle.Solid);
 
-                if (descText.GetGraphic() is CIMParagraphTextGraphic cimDescText)
-                {
-                    cimDescText.Frame.BorderSymbol.Symbol.SetSize(1);
-                    cimDescText.Frame.BorderSymbol.Symbol.SetColor(ColorFactory.Instance.BlackRGB);
-                    cimDescText.Frame.BorderCornerRounding = 45;
+                CIMGraphic cimDescGra = descText.GetGraphic();
+                CIMParagraphTextGraphic cimDescText = cimDescGra as CIMParagraphTextGraphic;
+                cimDescText.Frame.BorderSymbol.Symbol.SetSize(1);
+                cimDescText.Frame.BorderSymbol.Symbol.SetColor(ColorFactory.Instance.BlackRGB);
+                cimDescText.Frame.BorderCornerRounding = 45;
+                cimDescText.Frame.BackgroundSymbol = polySymbol.MakeSymbolReference();
+                cimDescText.Frame.BackgroundCornerRounding = 45;
+                descText.SetGraphic(cimDescGra);
 
+                //Remove Service Layer
+                string serviceLayer = $@"<dyn type =""layout"" name =""Portrait Layout with Inset"" property = ""serviceLayerCredits""/>";
+                Coordinate2D serviceLayer_ll = new(0, 0);
 
-                    descText.SetGraphic(cimDescText);
-                }
+                CIMTextSymbol cimServiceLayer = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.CreateRGBColor(255,255,255,0), 10);
+                var servText = ElementFactory.Instance.CreateTextGraphicElement(newLayout, TextType.PointText, serviceLayer_ll.ToMapPoint(), cimServiceLayer, serviceLayer, "Invisible Service Layer");
 
                 // Return the updated layout
                 return newLayout;
