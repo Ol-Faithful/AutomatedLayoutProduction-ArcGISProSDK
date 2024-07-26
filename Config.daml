@@ -17,8 +17,8 @@
       </tabs>
       <groups>
         <group id="AutomatedLayoutProduction_Group1" caption="Layouts" appearsOnAddInTab="true">
-          <tool refID="AutomatedLayoutProduction_LandscapeLayoutWithInset" size="large" />
-          <tool refID="AutomatedLayoutProduction_PortraitLayoutWithInset" size="large" />
+          <tool refID="AutomatedLayoutProduction_LandscapeLayoutWithInset" size="middle" />
+          <tool refID="AutomatedLayoutProduction_PortraitLayoutWithInset" size="middle" />
         </group>
       </groups>
       <controls>

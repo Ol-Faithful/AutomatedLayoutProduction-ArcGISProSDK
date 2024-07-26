@@ -5,6 +5,7 @@ using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Layouts;
 using ArcGIS.Desktop.Mapping;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AutomatedLayoutProduction
@@ -56,9 +57,9 @@ namespace AutomatedLayoutProduction
                     {
                         mfElm.SetCamera(combinedExtent);
 
-                        // Zoom out 15 percent
+                        // Zoom out 20 percent
                         Camera cam = mfElm.Camera;
-                        cam.Scale *= 1.15;
+                        cam.Scale *= 1.20;
                         mfElm.SetCamera(cam);
                     }
                 }
@@ -68,6 +69,13 @@ namespace AutomatedLayoutProduction
                 ArcGIS.Core.Geometry.Envelope env2 = EnvelopeBuilderEx.CreateEnvelope(smll, smur);
 
                 Map map2 = MapFactory.Instance.CopyMap(map);
+
+                QueuedTask.Run(() =>
+                {
+                    IReadOnlyList<Layer> layers = map2.Layers.ToList();
+                    map2.RemoveLayers(layers);
+                });
+
                 map2.SetBasemapLayers(Basemap.DarkGray);
                 map2.SetName("Inset Map: Low Zoom");
 
@@ -130,7 +138,7 @@ namespace AutomatedLayoutProduction
 
                         // Zoom out 15 percent
                         Camera cam = M2.Camera;
-                        cam.Scale *= 120;
+                        cam.Scale *= 5;
                         M2.SetCamera(cam);
                     }
                 }

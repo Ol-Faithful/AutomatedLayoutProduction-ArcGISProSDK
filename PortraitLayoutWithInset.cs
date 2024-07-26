@@ -6,6 +6,7 @@ using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Layouts;
 using ArcGIS.Desktop.Mapping;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AutomatedLayoutProduction
@@ -57,9 +58,9 @@ namespace AutomatedLayoutProduction
                     {
                         mfElm.SetCamera(combinedExtent);
 
-                        // Zoom out 15 percent
+                        // Zoom out 25 percent
                         Camera cam = mfElm.Camera;
-                        cam.Scale *= 1.20;
+                        cam.Scale *= 1.25;
                         mfElm.SetCamera(cam);
                     }
                 }
@@ -70,6 +71,13 @@ namespace AutomatedLayoutProduction
                 ArcGIS.Core.Geometry.Envelope env2 = EnvelopeBuilderEx.CreateEnvelope(smll, smur);
 
                 Map map2 = MapFactory.Instance.CopyMap(map);
+
+                QueuedTask.Run(() =>
+                {
+                    IReadOnlyList<Layer> layers = map2.Layers.ToList();
+                    map2.RemoveLayers(layers);
+                });
+
                 map2.SetBasemapLayers(Basemap.DarkGray);
                 map2.SetName("Inset Map: Low Zoom");
 
@@ -129,10 +137,9 @@ namespace AutomatedLayoutProduction
                     if (combinedExtent != null)
                     {
                         M2.SetCamera(combinedExtent);
-
                         // Zoom out 15 percent
                         Camera cam = M2.Camera;
-                        cam.Scale *= 10;
+                        cam.Scale *= 5;
                         M2.SetCamera(cam);
                     }
                 }
@@ -390,6 +397,8 @@ namespace AutomatedLayoutProduction
 
                 CIMTextSymbol cimServiceLayer = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.CreateRGBColor(255,255,255,0), 10);
                 var servText = ElementFactory.Instance.CreateTextGraphicElement(newLayout, TextType.PointText, serviceLayer_ll.ToMapPoint(), cimServiceLayer, serviceLayer, "Invisible Service Layer");
+
+                //Group similar elements
 
                 // Return the updated layout
                 return newLayout;
