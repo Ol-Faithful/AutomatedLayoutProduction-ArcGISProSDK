@@ -2,6 +2,7 @@
 using ArcGIS.Core.Geometry;
 using ArcGIS.Core.Internal.CIM;
 using ArcGIS.Desktop.Core;
+using ArcGIS.Desktop.Core.Portal;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Layouts;
@@ -114,36 +115,34 @@ namespace AutomatedLayoutProduction
                 m2CIM.ExtentIndicators[0] = cIMExtentIndicator;
                 M2.SetDefinition(m2CIM);
 
-                // Calculate the combined extent of all active layers
-                if (map != null)
+                // Add the portal item as a new layer
+                CIMStroke outline = SymbolFactory.Instance.ConstructStroke(CIMColor.CreateRGBColor(50, 75, 33, 100),2,SimpleLineStyle.Solid);
+                CIMFill innard = SymbolFactory.Instance.ConstructSolidFill(CIMColor.CreateRGBColor(0, 0, 0, 0));
+                string portalItemID = "6b3112d1c2264cd39cfa1d109fa73283";
+                Item portalItem = ItemFactory.Instance.Create(portalItemID, ItemFactory.ItemType.PortalItem);
+                var layerParams = new FeatureLayerCreationParams(portalItem as PortalItem);
+                layerParams.RendererDefinition = new SimpleRendererDefinition()
                 {
-                    ArcGIS.Core.Geometry.Envelope combinedExtent = null;
-                    foreach (var layer in map.GetLayersAsFlattenedList().OfType<FeatureLayer>())
-                    {
-                        if (layer.IsVisible)
-                        {
-                            var layerExtent = layer.QueryExtent();
-                            if (combinedExtent == null)
-                            {
-                                combinedExtent = layerExtent;
-                            }
-                            else
-                            {
-                                combinedExtent = combinedExtent.Union(layerExtent);
-                            }
-                        }
-                    }
+                    SymbolTemplate = SymbolFactory.Instance.ConstructPolygonSymbol(innard, outline).MakeSymbolReference(),
+                    
+                };
+                var featureLayer = LayerFactory.Instance.CreateLayer<FeatureLayer>(layerParams, map2);
+                featureLayer.SetLabelVisibility(true);
+                var featureLayerDef = featureLayer.GetDefinition() as CIMFeatureLayer;
+                var labelClass = featureLayerDef.LabelClasses.FirstOrDefault();
+                if (labelClass != null)
+                {
+                    var texSymbol = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.CreateRGBColor(0, 122, 194, 100), 18, "Arial", "Regular");
+                    labelClass.TextSymbol.Symbol = texSymbol;
+                    featureLayerDef.LabelClasses = new[] { labelClass };
+                    featureLayer.SetDefinition(featureLayerDef);
+                };
 
-                    // Set the map frame extent to the combined extent of all active layers
-                    if (combinedExtent != null)
-                    {
-                        M2.SetCamera(combinedExtent);
-                        // Zoom out 15 percent
-                        Camera cam = M2.Camera;
-                        cam.Scale *= 5;
-                        M2.SetCamera(cam);
-                    }
-                }
+                //extent for inset map frame
+                Camera cam2 = M2.Camera;
+                cam2 = mfElm.Camera;
+                cam2.Scale *= 5;
+                M2.SetCamera(cam2);
 
                 // Add Title bar graphic element
                 Coordinate2D tBar_ll = new(0.125, 10.25);
