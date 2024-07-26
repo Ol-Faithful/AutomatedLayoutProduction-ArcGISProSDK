@@ -118,6 +118,7 @@ namespace AutomatedLayoutProduction
                 // Add the portal item as a new layer
                 CIMStroke outline = SymbolFactory.Instance.ConstructStroke(CIMColor.CreateRGBColor(50, 75, 33, 100),2,SimpleLineStyle.Solid);
                 CIMFill innard = SymbolFactory.Instance.ConstructSolidFill(CIMColor.CreateRGBColor(0, 0, 0, 0));
+                CIMStroke haloOutline = SymbolFactory.Instance.ConstructStroke(CIMColor.CreateRGBColor(0, 0, 0, 0),0,SimpleLineStyle.Solid);
                 string portalItemID = "6b3112d1c2264cd39cfa1d109fa73283";
                 Item portalItem = ItemFactory.Instance.Create(portalItemID, ItemFactory.ItemType.PortalItem);
                 var layerParams = new FeatureLayerCreationParams(portalItem as PortalItem);
@@ -132,9 +133,12 @@ namespace AutomatedLayoutProduction
                 var labelClass = featureLayerDef.LabelClasses.FirstOrDefault();
                 if (labelClass != null)
                 {
-                    var texSymbol = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.CreateRGBColor(0, 122, 194, 100), 18, "Arial", "Regular");
+                    var texSymbol = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.CreateRGBColor(0, 122, 194, 100), 12, "Arial", "Regular");
+                    texSymbol.HaloSize = .2;
+                    texSymbol.HaloSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(CIMColor.CreateRGBColor(255, 255, 255, 75),SimpleFillStyle.Solid, haloOutline);
                     labelClass.TextSymbol.Symbol = texSymbol;
                     featureLayerDef.LabelClasses = new[] { labelClass };
+                    featureLayerDef.Transparency = 0;
                     featureLayer.SetDefinition(featureLayerDef);
                 };
 
