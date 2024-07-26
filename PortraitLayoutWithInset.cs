@@ -6,6 +6,7 @@ using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Layouts;
 using ArcGIS.Desktop.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -107,8 +108,8 @@ namespace AutomatedLayoutProduction
                     CollapseSize = 999999999999,
                     PointSymbol = pointCIMRef,
                     Symbol = extentPolyRef,
-
                 };
+
                 m2CIM.ExtentIndicators = [cIMExtentIndicator];
                 m2CIM.ExtentIndicators[0] = cIMExtentIndicator;
                 M2.SetDefinition(m2CIM);
@@ -163,7 +164,7 @@ namespace AutomatedLayoutProduction
 
                 // Add the map name as a title in the bottom right corner of the map Frame
                 string title = $@"<dyn type=""mapFrame"" name=""Core Map Frame"" property=""mapName""/>";
-                Coordinate2D titlePosition = new(5.875, 1.375);
+                Coordinate2D titlePosition = new(6.25, 1.3);
 
                 SymbolStyleItem polyHalo = stylePrjItm.SearchSymbols(StyleItemType.PolygonSymbol, "Glacier")[0];
 
@@ -175,11 +176,25 @@ namespace AutomatedLayoutProduction
 
                 var titleInfo = new ElementInfo()
                 {
-                    Anchor = Anchor.BottomLeftCorner,
+                    Anchor = Anchor.BottomMidPoint,
 
                 };
 
                 var titleText = ElementFactory.Instance.CreateTextGraphicElement(newLayout, TextType.PointText, titlePosition.ToMapPoint(), cimTitle, title, "Core Map Title", true, titleInfo);
+
+                var titleAnchor = titleText.GetAnchor();
+                {
+                    titleAnchor = Anchor.BottomMidPoint;
+
+                    titleText.SetAnchor(titleAnchor);
+                };
+
+                var titleAnchorPoint = titleText.GetAnchorPoint();
+                {
+                    titleAnchorPoint = titlePosition;
+
+                    titleText.SetAnchorPoint(titleAnchorPoint);
+                };
 
                 //Add title to second map frame
                 string title2 = $@"<dyn type=""mapFrame""name=""Inset Map Frame"" property=""mapName""/>";
