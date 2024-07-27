@@ -1,6 +1,7 @@
 ﻿using ArcGIS.Core.CIM;
 using ArcGIS.Core.Geometry;
 using ArcGIS.Desktop.Core;
+using ArcGIS.Desktop.Core.Portal;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Layouts;
@@ -64,6 +65,7 @@ namespace AutomatedLayoutProduction
                     }
                 }
 
+                //Create Inset Map Frame
                 Coordinate2D smll = new(7, 4.125);
                 Coordinate2D smur = new(10.875, 8.375);
                 ArcGIS.Core.Geometry.Envelope env2 = EnvelopeBuilderEx.CreateEnvelope(smll, smur);
@@ -111,37 +113,38 @@ namespace AutomatedLayoutProduction
                 m2CIM.ExtentIndicators[0] = cIMExtentIndicator;
                 M2.SetDefinition(m2CIM);
 
-                // Calculate the combined extent of all active layers
-                if (map != null)
+                // Add the portal item as a new layer
+                CIMStroke outline = SymbolFactory.Instance.ConstructStroke(CIMColor.CreateRGBColor(50, 75, 33, 100), 2, SimpleLineStyle.Solid);
+                CIMFill innard = SymbolFactory.Instance.ConstructSolidFill(CIMColor.CreateRGBColor(0, 0, 0, 0));
+                CIMStroke haloOutline = SymbolFactory.Instance.ConstructStroke(CIMColor.CreateRGBColor(0, 0, 0, 0), 0, SimpleLineStyle.Solid);
+                string portalItemID = "6b3112d1c2264cd39cfa1d109fa73283";
+                Item portalItem = ItemFactory.Instance.Create(portalItemID, ItemFactory.ItemType.PortalItem);
+                var layerParams = new FeatureLayerCreationParams(portalItem as PortalItem);
+                layerParams.RendererDefinition = new SimpleRendererDefinition()
                 {
-                    ArcGIS.Core.Geometry.Envelope combinedExtent = null;
-                    foreach (var layer in map.GetLayersAsFlattenedList().OfType<FeatureLayer>())
-                    {
-                        if (layer.IsVisible)
-                        {
-                            var layerExtent = layer.QueryExtent();
-                            if (combinedExtent == null)
-                            {
-                                combinedExtent = layerExtent;
-                            }
-                            else
-                            {
-                                combinedExtent = combinedExtent.Union(layerExtent);
-                            }
-                        }
-                    }
+                    SymbolTemplate = SymbolFactory.Instance.ConstructPolygonSymbol(innard, outline).MakeSymbolReference(),
 
-                    // Set the map frame extent to the combined extent of all active layers
-                    if (combinedExtent != null)
-                    {
-                        M2.SetCamera(combinedExtent);
+                };
+                var featureLayer = LayerFactory.Instance.CreateLayer<FeatureLayer>(layerParams, map2);
+                featureLayer.SetLabelVisibility(true);
+                var featureLayerDef = featureLayer.GetDefinition() as CIMFeatureLayer;
+                var labelClass = featureLayerDef.LabelClasses.FirstOrDefault();
+                if (labelClass != null)
+                {
+                    var texSymbol = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.CreateRGBColor(0, 122, 194, 100), 12, "Arial", "Regular");
+                    texSymbol.HaloSize = .2;
+                    texSymbol.HaloSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(CIMColor.CreateRGBColor(255, 255, 255, 75), SimpleFillStyle.Solid, haloOutline);
+                    labelClass.TextSymbol.Symbol = texSymbol;
+                    featureLayerDef.LabelClasses = new[] { labelClass };
+                    featureLayerDef.Transparency = 0;
+                    featureLayer.SetDefinition(featureLayerDef);
+                };
 
-                        // Zoom out 15 percent
-                        Camera cam = M2.Camera;
-                        cam.Scale *= 5;
-                        M2.SetCamera(cam);
-                    }
-                }
+                //extent for inset map frame
+                Camera cam2 = M2.Camera;
+                cam2 = mfElm.Camera;
+                cam2.Scale *= 5;
+                M2.SetCamera(cam2);
 
                 // Add Title bar graphic element
                 Coordinate2D tBar_ll = new(0.125, 7.75);
@@ -279,7 +282,7 @@ namespace AutomatedLayoutProduction
                 }
 
                 // Add a legend in the bottom right corner of the layout
-                Coordinate2D leg_ul = new(7.25, 3.875);
+                Coordinate2D leg_ul = new(7.125, 4);
 
                 SymbolStyleItem textHalo = stylePrjItm.SearchSymbols(StyleItemType.PolygonSymbol, "Water Intermittent")[0];
 
@@ -368,6 +371,7 @@ namespace AutomatedLayoutProduction
 
                 CIMTextSymbol cimDesc = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 10, "Arial", "Regular");
                 cimDesc.HorizontalAlignment = HorizontalAlignment.Center;
+                cimDesc.OffsetY = -5;
 
                 var descInfo = new ElementInfo()
                 {
