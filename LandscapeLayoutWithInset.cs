@@ -1,11 +1,13 @@
 ﻿using ArcGIS.Core.CIM;
 using ArcGIS.Core.Geometry;
 using ArcGIS.Desktop.Core;
+using ArcGIS.Desktop.Core.Geoprocessing;
 using ArcGIS.Desktop.Core.Portal;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
 using ArcGIS.Desktop.Layouts;
 using ArcGIS.Desktop.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -78,7 +80,8 @@ namespace AutomatedLayoutProduction
                     map2.RemoveLayers(layers);
                 });
 
-                map2.SetBasemapLayers(Basemap.DarkGray);
+                var basemap = LayerFactory.Instance.CreateLayer(new Uri("https://www.arcgis.com/sharing/rest/content/items/5e9b3685f4c24d8781073dd928ebda50/resources/styles/root.json"), map2);
+                var cities = LayerFactory.Instance.CreateLayer(new Uri("https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Major_Cities_/FeatureServer/0"), map2);
                 map2.SetName("Inset Map: Low Zoom");
 
                 SymbolStyleItem point = stylePrjItm.SearchSymbols(StyleItemType.PointSymbol, "Esri Pin 1")[0];
@@ -135,6 +138,22 @@ namespace AutomatedLayoutProduction
                     texSymbol.HaloSize = .2;
                     texSymbol.HaloSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(CIMColor.CreateRGBColor(255, 255, 255, 75), SimpleFillStyle.Solid, haloOutline);
                     labelClass.TextSymbol.Symbol = texSymbol;
+                    labelClass.MaplexLabelPlacementProperties.FeatureType = LabelFeatureType.Polygon;
+                    labelClass.MaplexLabelPlacementProperties.PolygonPlacementMethod = MaplexPolygonPlacementMethod.RepeatAlongBoundary;
+                    labelClass.MaplexLabelPlacementProperties.BoundaryLabelingAllowSingleSided = false;
+                    labelClass.MaplexLabelPlacementProperties.BoundaryLabelingSingleSidedOnLine = false;
+                    labelClass.MaplexLabelPlacementProperties.LabelBuffer = 50;
+                    labelClass.MaplexLabelPlacementProperties.IsLabelBufferHardConstraint = true;
+                    labelClass.MaplexLabelPlacementProperties.CanPlaceLabelOutsidePolygon = false;
+                    labelClass.MaplexLabelPlacementProperties.AvoidPolygonHoles = true;
+                    labelClass.MaplexLabelPlacementProperties.RemoveAmbiguousLabels = MaplexRemoveAmbiguousLabelsType.All;
+                    labelClass.MaplexLabelPlacementProperties.PolygonBoundaryWeight = 0;
+                    labelClass.MaplexLabelPlacementProperties.FeatureWeight = 1000;
+                    labelClass.MaplexLabelPlacementProperties.PreferHorizontalPlacement = true;
+                    labelClass.MaplexLabelPlacementProperties.PrimaryOffset = 5;
+                    labelClass.MaplexLabelPlacementProperties.IsOffsetFromFeatureGeometry = true;
+                    labelClass.MaplexLabelPlacementProperties.AlignLabelToLineDirection = false;
+                    labelClass.MaplexLabelPlacementProperties.RepeatLabel = false;
                     featureLayerDef.LabelClasses = new[] { labelClass };
                     featureLayerDef.Transparency = 0;
                     featureLayer.SetDefinition(featureLayerDef);
@@ -143,7 +162,7 @@ namespace AutomatedLayoutProduction
                 //extent for inset map frame
                 Camera cam2 = M2.Camera;
                 cam2 = mfElm.Camera;
-                cam2.Scale *= 5;
+                cam2.Scale *= 4;
                 M2.SetCamera(cam2);
 
                 // Add Title bar graphic element

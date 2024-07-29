@@ -5,11 +5,13 @@ using ArcGIS.Desktop.Core;
 using ArcGIS.Desktop.Core.Portal;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
+using ArcGIS.Desktop.Internal.Mapping.Operations;
 using ArcGIS.Desktop.Layouts;
 using ArcGIS.Desktop.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static System.Net.WebRequestMethods;
 
 namespace AutomatedLayoutProduction
 {
@@ -80,7 +82,7 @@ namespace AutomatedLayoutProduction
                     map2.RemoveLayers(layers);
                 });
 
-                map2.SetBasemapLayers(Basemap.DarkGray);
+                var basemap = LayerFactory.Instance.CreateLayer(new Uri("https://www.arcgis.com/sharing/rest/content/items/5e9b3685f4c24d8781073dd928ebda50/resources/styles/root.json"), map2);
                 map2.SetName("Inset Map: Low Zoom");
 
                 SymbolStyleItem point = stylePrjItm.SearchSymbols(StyleItemType.PointSymbol, "Esri Pin 1")[0];
