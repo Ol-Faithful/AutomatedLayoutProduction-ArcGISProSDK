@@ -80,9 +80,11 @@ namespace AutomatedLayoutProduction
                     map2.RemoveLayers(layers);
                 });
 
-                var basemap = LayerFactory.Instance.CreateLayer(new Uri("https://www.arcgis.com/sharing/rest/content/items/5e9b3685f4c24d8781073dd928ebda50/resources/styles/root.json"), map2);
-                var cities = LayerFactory.Instance.CreateLayer(new Uri("https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Major_Cities_/FeatureServer/0"), map2);
                 map2.SetName("Inset Map: Low Zoom");
+
+                var basemap = LayerFactory.Instance.CreateLayer(new Uri("https://www.arcgis.com/sharing/rest/content/items/5e9b3685f4c24d8781073dd928ebda50/resources/styles/root.json"), map2);
+                
+                var cities = LayerFactory.Instance.CreateLayer(new Uri("https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Major_Cities_/FeatureServer/0"), map2);
 
                 SymbolStyleItem point = stylePrjItm.SearchSymbols(StyleItemType.PointSymbol, "Esri Pin 1")[0];
                 CIMPointSymbol pointCIM = point.Symbol as CIMPointSymbol;
