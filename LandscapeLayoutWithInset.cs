@@ -10,6 +10,7 @@ using ArcGIS.Desktop.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 
 namespace AutomatedLayoutProduction
 {
@@ -83,8 +84,36 @@ namespace AutomatedLayoutProduction
                 map2.SetName("Inset Map: Low Zoom");
 
                 var basemap = LayerFactory.Instance.CreateLayer(new Uri("https://www.arcgis.com/sharing/rest/content/items/5e9b3685f4c24d8781073dd928ebda50/resources/styles/root.json"), map2);
-                
-                var cities = LayerFactory.Instance.CreateLayer(new Uri("https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Major_Cities_/FeatureServer/0"), map2);
+                basemap.SetName("Dark Grey Base");
+
+                var citiesParam = new FeatureLayerCreationParams(new Uri(@"https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Major_Cities_/FeatureServer/0"))
+                {
+                    Name = "Major Cities",
+                    DefinitionQuery = new DefinitionQuery(whereClause: "POP_CLASS >= 7", name: "Population Definition"),
+                    RendererDefinition = new SimpleRendererDefinition()
+                    {
+                        SymbolTemplate = SymbolFactory.Instance.ConstructPointSymbol(CIMColor.CreateRGBColor(255, 144, 200, 100), 9, SimpleMarkerStyle.Diamond).MakeSymbolReference(),
+                    },
+                    
+
+                };
+
+                var cities = LayerFactory.Instance.CreateLayer<FeatureLayer>(citiesParam, map2);
+
+                var citiesDef = cities.GetDefinition() as CIMFeatureLayer;
+                var citiesLabel = citiesDef.LabelClasses.FirstOrDefault();
+                if (citiesLabel != null)
+                {
+                    var citiesText = SymbolFactory.Instance.ConstructTextSymbol(CIMColor.CreateRGBColor(177, 48, 177, 100), 8, "Arial", "Regular");
+                    citiesText.HaloSize = .2;
+                    citiesText.HaloSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(CIMColor.CreateRGBColor(255, 255, 255, 75), SimpleFillStyle.Solid);
+                    citiesLabel.TextSymbol.Symbol = citiesText;
+                    citiesLabel.MaplexLabelPlacementProperties.FeatureType = LabelFeatureType.Point;
+                    citiesDef.LabelClasses = new[] { citiesLabel };
+                    cities.SetDefinition(citiesDef);
+                }
+
+
 
                 SymbolStyleItem point = stylePrjItm.SearchSymbols(StyleItemType.PointSymbol, "Esri Pin 1")[0];
                 CIMPointSymbol pointCIM = point.Symbol as CIMPointSymbol;
@@ -128,7 +157,7 @@ namespace AutomatedLayoutProduction
                 layerParams.RendererDefinition = new SimpleRendererDefinition()
                 {
                     SymbolTemplate = SymbolFactory.Instance.ConstructPolygonSymbol(innard, outline).MakeSymbolReference(),
-
+                    
                 };
                 var featureLayer = LayerFactory.Instance.CreateLayer<FeatureLayer>(layerParams, map2);
                 featureLayer.SetLabelVisibility(true);
@@ -184,9 +213,9 @@ namespace AutomatedLayoutProduction
                 var tBar = ElementFactory.Instance.CreateGraphicElement(newLayout, tBarGraphic, "Title Bar", true, tBarElInfo);
 
 
-                // Add the map name as a title in the top left corner of the map Frame
+                // Add the map name as a title in the top center of the map Frame
                 string title = $@"<dyn type=""mapFrame"" name=""Core Map Frame"" property=""mapName""/>";
-                Coordinate2D titlePosition = new(0.25, 7.2248);
+                Coordinate2D titlePosition = new(3.5, 7.6502);
 
                 SymbolStyleItem polyHalo = stylePrjItm.SearchSymbols(StyleItemType.PolygonSymbol, "Glacier")[0];
 
@@ -198,15 +227,27 @@ namespace AutomatedLayoutProduction
 
                 var titleInfo = new ElementInfo()
                 {
-                    Anchor = Anchor.BottomLeftCorner,
+                    Anchor = Anchor.TopMidPoint,
 
                 };
 
                 var titleText = ElementFactory.Instance.CreateTextGraphicElement(newLayout, TextType.PointText, titlePosition.ToMapPoint(), cimTitle, title, "Core Map Title", true, titleInfo);
+                
+                var titleTextAnchor = titleText.GetAnchor();
+                {
+                    titleTextAnchor = Anchor.TopMidPoint;
+                    titleText.SetAnchor(titleTextAnchor);
+                }
 
+                var titleTextAnchorPoint = titleText.GetAnchorPoint();
+                {
+                    titleTextAnchorPoint = titlePosition;
+                    titleText.SetAnchorPoint(titleTextAnchorPoint);
+                }
+                
                 //Add title to second map frame
                 string title2 = $@"<dyn type=""mapFrame""name=""Inset Map Frame"" property=""mapName""/>";
-                Coordinate2D title2Position = new(10.75, 8.25);
+                Coordinate2D title2Position = new(9, 4.25);
 
                 CIMTextSymbol cimTitle2 = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 16, "Arial", "Bold");
                 cimTitle2.HaloSize = 1;
@@ -214,14 +255,14 @@ namespace AutomatedLayoutProduction
 
                 var titleInfo2 = new ElementInfo()
                 {
-                    Anchor = Anchor.TopRightCorner,
+                    Anchor = Anchor.BottomMidPoint,
                 };
 
                 var titleText2 = ElementFactory.Instance.CreateTextGraphicElement(newLayout, TextType.PointText, title2Position.ToMapPoint(), cimTitle2, title2, "Inset Map Title", true, titleInfo2);
 
                 var title2Anchor = titleText2.GetAnchor();
                 {
-                    title2Anchor = Anchor.TopRightCorner;
+                    title2Anchor = Anchor.BottomMidPoint;
 
                     titleText2.SetAnchor(title2Anchor);
                 }
@@ -235,7 +276,7 @@ namespace AutomatedLayoutProduction
 
                 // add project title as main title
                 string mainTitle = $@"<dyn type=""project"" property=""name""/>";
-                Coordinate2D mainTitlePosition = new(0.1875, 7.75);
+                Coordinate2D mainTitlePosition = new(3.5, 8.3557);
 
                 CIMTextSymbol cimMainTitle = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 36, "Arial", "Bold");
                 cimMainTitle.HaloSize = 1;
@@ -248,12 +289,23 @@ namespace AutomatedLayoutProduction
 
                 var mainTitleText = ElementFactory.Instance.CreateTextGraphicElement(newLayout, TextType.PointText, mainTitlePosition.ToMapPoint(), cimMainTitle, mainTitle, "Project Title", true, mainTitleInfo);
 
+                var mainTitleAnchor = mainTitleText.GetAnchor();
+                {
+                    mainTitleAnchor = Anchor.TopMidPoint;
+                    mainTitleText.SetAnchor(mainTitleAnchor);
+                }
+
+                var mainTitleAnchorPoint = mainTitleText.GetAnchorPoint();
+                {
+                    mainTitleAnchorPoint = mainTitlePosition;
+                    mainTitleText.SetAnchorPoint(mainTitleAnchorPoint);
+                }
 
                 // Add a north arrow in the top right corner of the layout
                 NorthArrowStyleItem naStyleItm = stylePrjItm.SearchNorthArrows("ArcGIS North 10")[0];
 
                 // Position the north arrow in the top right corner of the layout
-                Coordinate2D naPosition = new(6.5829, 7.125);
+                Coordinate2D naPosition = new(1.8916, 0.4395);
 
                 var naInfo = new NorthArrowInfo()
                 {
@@ -263,7 +315,7 @@ namespace AutomatedLayoutProduction
 
                 var arrowElm = ElementFactory.Instance.CreateMapSurroundElement(
                     newLayout, naPosition.ToMapPoint(), naInfo, "North Arrow") as NorthArrow;
-                arrowElm.SetHeight(.8);  // Adjust height as needed
+                arrowElm.SetHeight(0.371);  // Adjust height as needed
 
                 var northArrowCim = arrowElm.GetDefinition() as CIMMarkerNorthArrow;
                 var naPolyFille = SymbolFactory.Instance.ConstructSolidFill(ColorFactory.Instance.CreateRGBColor(0, 174, 239, 100));
@@ -278,8 +330,8 @@ namespace AutomatedLayoutProduction
                 // Add a scale bar in the bottom left corner of the layout
                 ScaleBarStyleItem sbStyleItm = stylePrjItm.SearchScaleBars("Double Alternating Scale Bar 1")[0];
 
-                Coordinate2D sb_ll = new(2.1843, 0.375);
-                Coordinate2D sb_ur = new(5.0657, 0.746);
+                Coordinate2D sb_ll = new(2.125, 0.254);
+                Coordinate2D sb_ur = new(5.0012, 0.625);
                 ArcGIS.Core.Geometry.Envelope sbenv = EnvelopeBuilderEx.CreateEnvelope(sb_ll, sb_ur);
 
                 var sbInfo = new ScaleBarInfo()
