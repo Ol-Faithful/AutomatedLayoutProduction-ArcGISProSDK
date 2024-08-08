@@ -89,7 +89,7 @@ namespace AutomatedLayoutProduction
                 var citiesParam = new FeatureLayerCreationParams(new Uri(@"https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Major_Cities_/FeatureServer/0"))
                 {
                     Name = "Major Cities",
-                    DefinitionQuery = new DefinitionQuery(whereClause: "POP_CLASS >= 7", name: "Population Definition"),
+                    DefinitionQuery = new DefinitionQuery(whereClause: "POP_CLASS >= 8", name: "Population Definition"),
                     RendererDefinition = new SimpleRendererDefinition()
                     {
                         SymbolTemplate = SymbolFactory.Instance.ConstructPointSymbol(CIMColor.CreateRGBColor(255, 144, 200, 100), 9, SimpleMarkerStyle.Diamond).MakeSymbolReference(),
@@ -99,7 +99,6 @@ namespace AutomatedLayoutProduction
                 };
 
                 var cities = LayerFactory.Instance.CreateLayer<FeatureLayer>(citiesParam, map2);
-
                 var citiesDef = cities.GetDefinition() as CIMFeatureLayer;
                 var citiesLabel = citiesDef.LabelClasses.FirstOrDefault();
                 if (citiesLabel != null)
@@ -109,9 +108,12 @@ namespace AutomatedLayoutProduction
                     citiesText.HaloSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(CIMColor.CreateRGBColor(255, 255, 255, 75), SimpleFillStyle.Solid);
                     citiesLabel.TextSymbol.Symbol = citiesText;
                     citiesLabel.MaplexLabelPlacementProperties.FeatureType = LabelFeatureType.Point;
+                    citiesLabel.MaplexLabelPlacementProperties.NeverRemoveLabel = true;
+                    citiesLabel.MaplexLabelPlacementProperties.IsOffsetFromFeatureGeometry = true;
                     citiesDef.LabelClasses = new[] { citiesLabel };
                     cities.SetDefinition(citiesDef);
-                }
+                    cities.SetLabelVisibility(true);
+                };
 
 
 
