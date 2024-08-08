@@ -85,10 +85,36 @@ namespace AutomatedLayoutProduction
                 map2.SetName("Inset Map: Low Zoom");
 
                 var basemap = LayerFactory.Instance.CreateLayer(new Uri("https://www.arcgis.com/sharing/rest/content/items/5e9b3685f4c24d8781073dd928ebda50/resources/styles/root.json"), map2);
-                
-                var cities = LayerFactory.Instance.CreateLayer(new Uri("https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Major_Cities_/FeatureServer/0"), map2);
-                
+                basemap.SetName("Dark Grey Base");
+
+                var citiesParam = new FeatureLayerCreationParams(new Uri(@"https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Major_Cities_/FeatureServer/0"))
+                {
+                    Name = "Major Cities",
+                    DefinitionQuery = new DefinitionQuery(whereClause: "POP_CLASS >= 8", name: "Population Definition"),
+                    RendererDefinition = new SimpleRendererDefinition()
+                    {
+                        SymbolTemplate = SymbolFactory.Instance.ConstructPointSymbol(CIMColor.CreateRGBColor(255, 144, 200, 100), 9, SimpleMarkerStyle.Diamond).MakeSymbolReference(),
+                    },
+
+
+                };
+
+                var cities = LayerFactory.Instance.CreateLayer<FeatureLayer>(citiesParam, map2);
                 var citiesDef = cities.GetDefinition() as CIMFeatureLayer;
+                var citiesLabel = citiesDef.LabelClasses.FirstOrDefault();
+                if (citiesLabel != null)
+                {
+                    var citiesText = SymbolFactory.Instance.ConstructTextSymbol(CIMColor.CreateRGBColor(177, 48, 177, 100), 8, "Arial", "Regular");
+                    citiesText.HaloSize = .2;
+                    citiesText.HaloSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(CIMColor.CreateRGBColor(255, 255, 255, 75), SimpleFillStyle.Solid);
+                    citiesLabel.TextSymbol.Symbol = citiesText;
+                    citiesLabel.MaplexLabelPlacementProperties.FeatureType = LabelFeatureType.Point;
+                    citiesLabel.MaplexLabelPlacementProperties.NeverRemoveLabel = true;
+                    citiesLabel.MaplexLabelPlacementProperties.IsOffsetFromFeatureGeometry = true;
+                    citiesDef.LabelClasses = new[] { citiesLabel };
+                    cities.SetDefinition(citiesDef);
+                    cities.SetLabelVisibility(true);
+                };
 
                 SymbolStyleItem point = stylePrjItm.SearchSymbols(StyleItemType.PointSymbol, "Esri Pin 1")[0];
                 CIMPointSymbol pointCIM = point.Symbol as CIMPointSymbol;
