@@ -310,7 +310,7 @@ namespace AutomatedLayoutProduction
                 arrowElm.SetHeight(.8);  // Adjust height as needed
 
                 var northArrowCim = arrowElm.GetDefinition() as CIMMarkerNorthArrow;
-                var naPolyFille = SymbolFactory.Instance.ConstructSolidFill(ColorFactory.Instance.CreateRGBColor(0, 174, 239, 100));
+                var naPolyFille = SymbolFactory.Instance.ConstructSolidFill(ColorFactory.Instance.CreateRGBColor(249, 249, 245, 100));
                 var naPolyStroke = SymbolFactory.Instance.ConstructStroke(ColorFactory.Instance.WhiteRGB, 0);
                 var halopoly = SymbolFactory.Instance.ConstructPolygonSymbol(naPolyFille, naPolyStroke);
 

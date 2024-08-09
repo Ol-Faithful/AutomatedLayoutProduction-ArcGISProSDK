@@ -97,7 +97,6 @@ namespace AutomatedLayoutProduction
                     
 
                 };
-
                 var cities = LayerFactory.Instance.CreateLayer<FeatureLayer>(citiesParam, map2);
                 var citiesDef = cities.GetDefinition() as CIMFeatureLayer;
                 var citiesLabel = citiesDef.LabelClasses.FirstOrDefault();
@@ -198,6 +197,11 @@ namespace AutomatedLayoutProduction
                 cam2.Scale *= 4;
                 M2.SetCamera(cam2);
 
+                //halo symbol
+                var naPolyFille = SymbolFactory.Instance.ConstructSolidFill(ColorFactory.Instance.CreateRGBColor(177, 120, 177, 100));
+                var naPolyStroke = SymbolFactory.Instance.ConstructStroke(ColorFactory.Instance.WhiteRGB, 0);
+                var halopoly = SymbolFactory.Instance.ConstructPolygonSymbol(naPolyFille, naPolyStroke);
+
                 // Add Title bar graphic element
                 Coordinate2D tBar_ll = new(0.125, 7.75);
                 Coordinate2D tBar_ur = new(7, 8.375);
@@ -214,18 +218,13 @@ namespace AutomatedLayoutProduction
 
                 var tBar = ElementFactory.Instance.CreateGraphicElement(newLayout, tBarGraphic, "Title Bar", true, tBarElInfo);
 
-
                 // Add the map name as a title in the top center of the map Frame
                 string title = $@"<dyn type=""mapFrame"" name=""Core Map Frame"" property=""mapName""/>";
                 Coordinate2D titlePosition = new(3.5, 7.6502);
 
-                SymbolStyleItem polyHalo = stylePrjItm.SearchSymbols(StyleItemType.PolygonSymbol, "Glacier")[0];
-
-                CIMPolygonSymbol glacierHalo = polyHalo.Symbol as CIMPolygonSymbol;
-
-                CIMTextSymbol cimTitle = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 24, "Arial", "Bold");
+                CIMTextSymbol cimTitle = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 24, "Harlow Solid Italic", "Bold");
                 cimTitle.HaloSize = 1;
-                cimTitle.HaloSymbol = glacierHalo;
+                cimTitle.HaloSymbol = halopoly;
 
                 var titleInfo = new ElementInfo()
                 {
@@ -246,14 +245,14 @@ namespace AutomatedLayoutProduction
                     titleTextAnchorPoint = titlePosition;
                     titleText.SetAnchorPoint(titleTextAnchorPoint);
                 }
-                
+
                 //Add title to second map frame
                 string title2 = $@"<dyn type=""mapFrame""name=""Inset Map Frame"" property=""mapName""/>";
                 Coordinate2D title2Position = new(9, 4.25);
 
-                CIMTextSymbol cimTitle2 = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 16, "Arial", "Bold");
+                CIMTextSymbol cimTitle2 = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 16, "Harlow Solid Italic", "Bold");
                 cimTitle2.HaloSize = 1;
-                cimTitle2.HaloSymbol = glacierHalo;
+                cimTitle2.HaloSymbol = halopoly;
 
                 var titleInfo2 = new ElementInfo()
                 {
@@ -282,7 +281,7 @@ namespace AutomatedLayoutProduction
 
                 CIMTextSymbol cimMainTitle = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 36, "Arial", "Bold");
                 cimMainTitle.HaloSize = 1;
-                cimMainTitle.HaloSymbol = glacierHalo;
+                cimMainTitle.HaloSymbol = halopoly;
 
                 var mainTitleInfo = new ElementInfo()
                 {
@@ -320,9 +319,6 @@ namespace AutomatedLayoutProduction
                 arrowElm.SetHeight(0.371);  // Adjust height as needed
 
                 var northArrowCim = arrowElm.GetDefinition() as CIMMarkerNorthArrow;
-                var naPolyFille = SymbolFactory.Instance.ConstructSolidFill(ColorFactory.Instance.CreateRGBColor(0, 174, 239, 100));
-                var naPolyStroke = SymbolFactory.Instance.ConstructStroke(ColorFactory.Instance.WhiteRGB, 0);
-                var halopoly = SymbolFactory.Instance.ConstructPolygonSymbol(naPolyFille, naPolyStroke);
 
                 ((CIMPointSymbol)northArrowCim.PointSymbol.Symbol).HaloSymbol = halopoly;
                 ((CIMPointSymbol)northArrowCim.PointSymbol.Symbol).HaloSize = 1;
