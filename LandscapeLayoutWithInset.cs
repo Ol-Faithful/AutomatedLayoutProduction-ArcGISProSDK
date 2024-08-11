@@ -148,10 +148,12 @@ namespace AutomatedLayoutProduction
                 m2CIM.ExtentIndicators[0] = cIMExtentIndicator;
                 M2.SetDefinition(m2CIM);
 
-                // Add the portal item as a new layer
+                //Create Halo Outline for Text
                 CIMStroke outline = SymbolFactory.Instance.ConstructStroke(CIMColor.CreateRGBColor(50, 75, 33, 100), 2, SimpleLineStyle.Solid);
                 CIMFill innard = SymbolFactory.Instance.ConstructSolidFill(CIMColor.CreateRGBColor(0, 0, 0, 0));
                 CIMStroke haloOutline = SymbolFactory.Instance.ConstructStroke(CIMColor.CreateRGBColor(0, 0, 0, 0), 0, SimpleLineStyle.Solid);
+
+                // Add the portal item as a new layer
                 string portalItemID = "6b3112d1c2264cd39cfa1d109fa73283";
                 Item portalItem = ItemFactory.Instance.Create(portalItemID, ItemFactory.ItemType.PortalItem);
                 var layerParams = new FeatureLayerCreationParams(portalItem as PortalItem);
@@ -279,7 +281,7 @@ namespace AutomatedLayoutProduction
                 string mainTitle = $@"<dyn type=""project"" property=""name""/>";
                 Coordinate2D mainTitlePosition = new(3.5, 8.3557);
 
-                CIMTextSymbol cimMainTitle = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 36, "Arial", "Bold");
+                CIMTextSymbol cimMainTitle = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 36, "Eras Bold ITC", "Bold");
                 cimMainTitle.HaloSize = 1;
                 cimMainTitle.HaloSymbol = halopoly;
 
@@ -382,13 +384,20 @@ namespace AutomatedLayoutProduction
                 }
 
 
-                CIMTextSymbol tSym = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 12, "Arial", "Regular");
-                tSym.HaloSymbol = waterIntermit;
-                tSym.HaloSize = .25;
+                CIMTextSymbol tSym = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 16, "Eras Demi ITC", "Regular");
+                tSym.HaloSize = 1;
+                tSym.HaloSymbol = halopoly;
 
                 CIMSymbolReference titleSym = new()
                 {
                     Symbol = tSym,
+                };
+
+                CIMTextSymbol layertextSym = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 12, "Eras Light ITC", "Regular");
+
+                CIMSymbolReference layerSym = new()
+                {
+                    Symbol = layertextSym,
                 };
 
                 if (legendElm.GetDefinition() is CIMLegend cimLegend)
@@ -408,8 +417,8 @@ namespace AutomatedLayoutProduction
                         item.ShowHeading = false;
                         item.ShowGroupLayerName = false;
                         item.ShowLayerName = false;
-                        item.LabelSymbol = titleSym;
-                        item.LayerNameSymbol = titleSym;
+                        item.LabelSymbol = layerSym;
+                        item.LayerNameSymbol = layerSym;
                     }
 
                     // Apply changes to the legend element again
