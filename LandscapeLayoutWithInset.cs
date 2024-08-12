@@ -1,10 +1,12 @@
 ﻿using ArcGIS.Core.CIM;
 using ArcGIS.Core.Geometry;
+using ArcGIS.Core.Internal.CIM;
 using ArcGIS.Desktop.Core;
 using ArcGIS.Desktop.Core.Geoprocessing;
 using ArcGIS.Desktop.Core.Portal;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
+using ArcGIS.Desktop.Internal.Mapping.Labeling;
 using ArcGIS.Desktop.Layouts;
 using ArcGIS.Desktop.Mapping;
 using System;
@@ -102,20 +104,25 @@ namespace AutomatedLayoutProduction
                 var citiesLabel = citiesDef.LabelClasses.FirstOrDefault();
                 if (citiesLabel != null)
                 {
+                    var citiesLineCallout = new CIMPointSymbolCallout
+                    {
+                        LeaderLineSymbol = SymbolFactory.Instance.ConstructLineSymbol(ColorFactory.Instance.BlackRGB, 1, SimpleLineStyle.Solid),
+                        LineStyle = LeaderLineStyle.Base,
+                        PointSymbol = SymbolFactory.Instance.ConstructPointSymbol(CIMColor.CreateRGBColor(0, 0, 0, 0), 0, SimpleMarkerStyle.Circle)
+                    };
                     var citiesText = SymbolFactory.Instance.ConstructTextSymbol(CIMColor.CreateRGBColor(177, 48, 177, 100), 8, "Arial", "Regular");
                     citiesText.HaloSize = .2;
                     citiesText.HaloSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(CIMColor.CreateRGBColor(255, 255, 255, 75), SimpleFillStyle.Solid);
+                    citiesText.Callout = citiesLineCallout;
                     citiesLabel.TextSymbol.Symbol = citiesText;
                     citiesLabel.MaplexLabelPlacementProperties.FeatureType = LabelFeatureType.Point;
                     citiesLabel.MaplexLabelPlacementProperties.NeverRemoveLabel = true;
-                    citiesLabel.MaplexLabelPlacementProperties.IsOffsetFromFeatureGeometry = true;
+                    citiesLabel.MaplexLabelPlacementProperties.IsOffsetFromFeatureGeometry = false;
                     citiesLabel.MaplexLabelPlacementProperties.PrimaryOffset = 5;
                     citiesDef.LabelClasses = new[] { citiesLabel };
                     cities.SetDefinition(citiesDef);
                     cities.SetLabelVisibility(true);
                 };
-
-
 
                 SymbolStyleItem point = stylePrjItm.SearchSymbols(StyleItemType.PointSymbol, "Esri Pin 1")[0];
                 CIMPointSymbol pointCIM = point.Symbol as CIMPointSymbol;
