@@ -108,7 +108,7 @@ namespace AutomatedLayoutProduction
                     {
                         LeaderLineSymbol = SymbolFactory.Instance.ConstructLineSymbol(ColorFactory.Instance.BlackRGB, 1, SimpleLineStyle.Solid),
                         LineStyle = LeaderLineStyle.Base,
-                        PointSymbol = SymbolFactory.Instance.ConstructPointSymbol(CIMColor.CreateRGBColor(0, 0, 0, 0), 0, SimpleMarkerStyle.Circle)
+                        PointSymbol = SymbolFactory.Instance.ConstructPointSymbol(CIMColor.CreateRGBColor(0, 0, 0, 0), 0, SimpleMarkerStyle.Circle),
                     };
                     var citiesText = SymbolFactory.Instance.ConstructTextSymbol(CIMColor.CreateRGBColor(177, 48, 177, 100), 8, "Arial", "Regular");
                     citiesText.HaloSize = .2;
