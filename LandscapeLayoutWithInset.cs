@@ -326,7 +326,7 @@ namespace AutomatedLayoutProduction
 
                 var arrowElm = ElementFactory.Instance.CreateMapSurroundElement(
                     newLayout, naPosition.ToMapPoint(), naInfo, "North Arrow") as NorthArrow;
-                arrowElm.SetHeight(0.371);  // Adjust height as needed
+                arrowElm.SetHeight(0.293);  // Adjust height as needed
 
                 var northArrowCim = arrowElm.GetDefinition() as CIMMarkerNorthArrow;
 
@@ -392,7 +392,7 @@ namespace AutomatedLayoutProduction
                 }
 
 
-                CIMTextSymbol tSym = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 16, "Eras Demi ITC", "Regular");
+                CIMTextSymbol tSym = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 14, "Eras Demi ITC", "Regular");
                 tSym.HaloSize = 1;
                 tSym.HaloSymbol = halopoly;
 
