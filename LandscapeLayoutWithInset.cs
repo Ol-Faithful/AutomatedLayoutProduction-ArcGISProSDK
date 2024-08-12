@@ -109,6 +109,7 @@ namespace AutomatedLayoutProduction
                     citiesLabel.MaplexLabelPlacementProperties.FeatureType = LabelFeatureType.Point;
                     citiesLabel.MaplexLabelPlacementProperties.NeverRemoveLabel = true;
                     citiesLabel.MaplexLabelPlacementProperties.IsOffsetFromFeatureGeometry = true;
+                    citiesLabel.MaplexLabelPlacementProperties.PrimaryOffset = 5;
                     citiesDef.LabelClasses = new[] { citiesLabel };
                     cities.SetDefinition(citiesDef);
                     cities.SetLabelVisibility(true);
@@ -393,7 +394,7 @@ namespace AutomatedLayoutProduction
                     Symbol = tSym,
                 };
 
-                CIMTextSymbol layertextSym = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 12, "Eras Light ITC", "Regular");
+                CIMTextSymbol layertextSym = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 12, "Eras Medium ITC", "Regular");
 
                 CIMSymbolReference layerSym = new()
                 {
@@ -449,7 +450,7 @@ namespace AutomatedLayoutProduction
                 Coordinate2D description_ur = new(10.875, 1.125);
                 ArcGIS.Core.Geometry.Envelope descEnvPosition = EnvelopeBuilderEx.CreateEnvelope(description_ll, description_ur);
 
-                CIMTextSymbol cimDesc = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 10, "Arial", "Regular");
+                CIMTextSymbol cimDesc = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 10, "Eras Medium ITC", "Regular");
                 cimDesc.HorizontalAlignment = HorizontalAlignment.Center;
                 cimDesc.OffsetY = -5;
 
