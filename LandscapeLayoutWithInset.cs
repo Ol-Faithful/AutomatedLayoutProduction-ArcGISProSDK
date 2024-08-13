@@ -306,7 +306,7 @@ namespace AutomatedLayoutProduction
 
                 // add project title as main title
                 string mainTitle = $@"<dyn type=""project"" property=""name""/>";
-                Coordinate2D mainTitlePosition = new(3.5, 8.3557);
+                Coordinate2D mainTitlePosition = new(3.5, 8.375);
 
                 CIMTextSymbol cimMainTitle = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 36, "Eras Bold ITC", "Bold");
                 cimMainTitle.HaloSize = 1;
@@ -414,6 +414,7 @@ namespace AutomatedLayoutProduction
                 CIMTextSymbol tSym = SymbolFactory.Instance.ConstructTextSymbol(ColorFactory.Instance.BlackRGB, 14, "Eras Demi ITC", "Regular");
                 tSym.HaloSize = 1;
                 tSym.HaloSymbol = halopoly;
+                tSym.OffsetX = 100;
 
                 CIMSymbolReference titleSym = new()
                 {
@@ -451,7 +452,7 @@ namespace AutomatedLayoutProduction
                     // Apply changes to the legend element again
                     legendElm.SetDefinition(cimLegend);
                 }
-
+                
                 //Add rectangle around legend
                 Coordinate2D legrec_ll = new(7, 1.125);
                 Coordinate2D legrec_ur = new(10.875, 4.125);
