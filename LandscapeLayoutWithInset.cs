@@ -6,6 +6,7 @@ using ArcGIS.Desktop.Core.Geoprocessing;
 using ArcGIS.Desktop.Core.Portal;
 using ArcGIS.Desktop.Framework.Contracts;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
+using ArcGIS.Desktop.Internal.Framework.Win32;
 using ArcGIS.Desktop.Internal.Mapping.Labeling;
 using ArcGIS.Desktop.Layouts;
 using ArcGIS.Desktop.Mapping;
@@ -99,16 +100,34 @@ namespace AutomatedLayoutProduction
                     
 
                 };
+
+                CIMStroke citiesLabelStroke = SymbolFactory.Instance.ConstructStroke(CIMColor.CreateRGBColor(0, 0, 0, 100), 1, SimpleLineStyle.Solid);
+
+                CIMFill citiesLabelFill = SymbolFactory.Instance.ConstructSolidFill(CIMColor.CreateRGBColor(236, 234, 222, 100));
+
+                CIMTextMargin citiesLabelMargin = new CIMTextMargin()
+                {
+                    Bottom = 3,
+                    Top = 3,
+                    Left = 3,
+                    Right =3,
+                };
                 var cities = LayerFactory.Instance.CreateLayer<FeatureLayer>(citiesParam, map2);
                 var citiesDef = cities.GetDefinition() as CIMFeatureLayer;
                 var citiesLabel = citiesDef.LabelClasses.FirstOrDefault();
                 if (citiesLabel != null)
                 {
-                    var citiesLineCallout = new CIMPointSymbolCallout
+                    var citiesLineCallout = new CIMCompositeCallout
                     {
-                        LeaderLineSymbol = SymbolFactory.Instance.ConstructLineSymbol(ColorFactory.Instance.BlackRGB, 1, SimpleLineStyle.Solid),
-                        LineStyle = LeaderLineStyle.Base,
-                        PointSymbol = SymbolFactory.Instance.ConstructPointSymbol(CIMColor.CreateRGBColor(0, 0, 0, 0), 0, SimpleMarkerStyle.Circle),
+                        BackgroundSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(citiesLabelFill, citiesLabelStroke),
+                        CornerRadius = 8,
+                        LeaderLinePercentage = 60,
+                        LeaderLineSymbol = SymbolFactory.Instance.DefaultLineSymbol,
+                        DartWidth = 7,
+                        DartSymbol = SymbolFactory.Instance.ConstructPolygonSymbol(CIMColor.CreateRGBColor(0, 0, 0, 100)),
+                        SnapLeaderToCornersOnly = true,
+                        Margin = citiesLabelMargin
+                        
                     };
                     var citiesText = SymbolFactory.Instance.ConstructTextSymbol(CIMColor.CreateRGBColor(177, 48, 177, 100), 8, "Arial", "Regular");
                     citiesText.HaloSize = .2;
